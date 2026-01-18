@@ -1,0 +1,31 @@
+name: Deploy Frontend
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install
+        working-directory: rp-app
+        run: npm ci
+
+      - name: Build
+        working-directory: rp-app
+        run: npm run build
+
+      - name: Deploy
+        run: |
+          sudo mkdir -p /opt/rp/frontend
+          sudo rm -rf /opt/rp/frontend/*
+          sudo cp -r rp-app/dist/* /opt/rp/frontend/
+          sudo systemctl restart nginx
